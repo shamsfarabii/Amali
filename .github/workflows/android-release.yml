@@ -15,6 +15,10 @@ permissions:
 
 env:
   CI: true
+  # Expo SDK 57 defaults (expo-modules-autolinking ExpoRootProjectPlugin)
+  ANDROID_COMPILE_SDK: "35"
+  ANDROID_BUILD_TOOLS: "35.0.0"
+  ANDROID_NDK: "27.1.12297006"
 
 jobs:
   build-and-release:
@@ -36,7 +40,14 @@ jobs:
           java-version: 17
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: google-github-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: true
+          packages: |
+            platform-tools
+            platforms;android-${{ env.ANDROID_COMPILE_SDK }}
+            build-tools;${{ env.ANDROID_BUILD_TOOLS }}
+            ndk;${{ env.ANDROID_NDK }}
 
       - name: Install dependencies
         run: npm ci
