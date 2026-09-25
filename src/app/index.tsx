@@ -31,7 +31,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
-  const { duas, folders, loading, error, getFolder } = useDuas();
+  const { duas, folders, loading, error, getFolder, setBrowseIds } = useDuas();
   const { busy, importFromFile } = useBackupActions();
   const folderEditor = useFolderEditor();
   const [query, setQuery] = useState('');
@@ -73,7 +73,13 @@ export default function HomeScreen() {
     [searchIndex, filter, query],
   );
 
-  const openDua = useCallback((id: string) => router.push({ pathname: '/dua/[id]', params: { id } }), [router]);
+  const openDua = useCallback(
+    (duaId: string) => {
+      setBrowseIds(results.map((d) => d.id));
+      router.push({ pathname: '/dua/[id]', params: { id: duaId } });
+    },
+    [router, results, setBrowseIds],
+  );
   // New duas go into the folder being viewed.
   const addDua = () =>
     router.push({ pathname: '/dua/form', params: selectedFolder ? { folderId: selectedFolder.id } : {} });

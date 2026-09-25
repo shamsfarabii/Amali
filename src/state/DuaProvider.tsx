@@ -23,6 +23,8 @@ interface DuaContextValue {
   /** Deletes the folder; its duas stay in the collection without a folder. */
   deleteFolder: (id: string) => Promise<void>;
   applyImport: (plan: ImportPlan, mode: ImportMode) => Promise<void>;
+  browseIds: string[];
+  setBrowseIds: (ids: string[]) => void;
 }
 
 const DuaContext = createContext<DuaContextValue | null>(null);
@@ -41,6 +43,7 @@ export function DuaProvider({ children }: { children: ReactNode }) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [browseIds, setBrowseIds] = useState<string[]>([]);
 
   useEffect(() => {
     loadCollection()
@@ -131,6 +134,8 @@ export function DuaProvider({ children }: { children: ReactNode }) {
       renameFolder,
       deleteFolder,
       applyImport,
+      browseIds,
+      setBrowseIds,
     }),
     [
       duas,
@@ -147,6 +152,7 @@ export function DuaProvider({ children }: { children: ReactNode }) {
       renameFolder,
       deleteFolder,
       applyImport,
+      browseIds,
     ],
   );
 

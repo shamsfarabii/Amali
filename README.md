@@ -32,6 +32,32 @@ npx expo run:ios       # or: npx expo run:android  (local development build)
 
 EAS build profiles (`development`, `preview`, `production`) are defined in `eas.json`.
 
+## GitHub Releases (automatic APK)
+
+Every push to `main` runs [`.github/workflows/android-release.yml`](.github/workflows/android-release.yml): **GitHub Actions** installs dependencies, runs `expo prebuild`, builds `assembleRelease` with Gradle, and publishes a new [GitHub Release](https://github.com/shamsfarabii/Amal-/releases) with **Munajat.apk** attached.
+
+No Expo/EAS account is required for CI. Commit and push the workflow to `main` to enable it.
+
+Release tags look like `v1.0.0-build.42` (version from `app.json` plus workflow run number). You can also run **Actions → Android APK Release → Run workflow** manually.
+
+### Optional: production signing (GitHub secrets)
+
+Without secrets, the APK is release-built but signed with the default debug keystore from prebuild (OK for sideloading on your own devices). To use your own upload key, add these **Settings → Secrets and variables → Actions** secrets:
+
+| Secret | Description |
+|--------|-------------|
+| `ANDROID_KEYSTORE_BASE64` | Base64 of your `.jks` / `.keystore` file (`base64 -i upload.keystore \| pbcopy` on macOS) |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
+| `ANDROID_KEY_ALIAS` | Key alias |
+| `ANDROID_KEY_PASSWORD` | Key password |
+
+Generate a keystore locally if needed:
+
+```bash
+keytool -genkeypair -v -storetype PKCS12 -keystore upload.keystore -alias upload \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
 ## Checks
 
 ```bash
