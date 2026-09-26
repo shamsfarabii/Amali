@@ -15,6 +15,8 @@ permissions:
 
 env:
   CI: true
+  NODE_OPTIONS: --max-old-space-size=4096
+  FORCE_COLOR: "0"
   ANDROID_HOME: /usr/local/lib/android/sdk
   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
   # Match versions from `expo prebuild` (ExpoRootProjectPlugin / local Gradle)
@@ -93,12 +95,18 @@ jobs:
         working-directory: android
         run: |
           sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError/' gradle.properties
+          sed -i 's/^org.gradle.parallel=.*/org.gradle.parallel=false/' gradle.properties
           echo "android.lint.checkReleaseBuilds=false" >> gradle.properties
+          echo "org.gradle.workers.max=1" >> gradle.properties
+
+      - name: Bundle JavaScript (Metro)
+        working-directory: android
+        run: |
+          ./gradlew :app:createReleaseUpdatesResources :app:createBundleReleaseJsAndAssets \
+            --no-daemon --stacktrace
 
       - name: Build release APK
         working-directory: android
-        env:
-          GRADLE_OPTS: -Dorg.gradle.workers.max=2
         run: |
           ./gradlew :app:assembleRelease --no-daemon \
             -PreactNativeArchitectures=arm64-v8a,armeabi-v7a \
